@@ -1,0 +1,44 @@
+name: Image Scan
+description: Run Twistlock image scan
+
+inputs:
+  tl-username:
+    description: The username
+    required: true
+  tl-password:
+    description: The password
+    required: true
+  tl-console-url:
+    description: The console URL (e.g., https://console.your-company.org:8083)
+    required: true
+  tl-cli-version:
+    description: The version of the Twistlock CLI
+    required: true
+    default: v1
+  docker-image:
+    description: The name of the Docker image
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Download CLI from Twistlock console
+      shell: bash
+      run: |
+        curl --fail --silent --show-error --location \
+          --insecure \
+          --user "${{ inputs.tl-username }}:${{ inputs.tl-password }}" \
+          --output ./twistcli \
+          "${{ inputs.tl-console-url }}/api/${{ inputs.tl-cli-version }}/util/twistcli"
+        chmod +x ./twistcli
+
+    - name: Scan the image using the Twistlock CLI
+      shell: bash
+      run: |
+        ./twistcli images scan \
+          --ci \
+          --details \
+          --address "${{ inputs.tl-console-url }}" \
+          -u "${{ inputs.tl-username }}" \
+          -p "${{ inputs.tl-password }}" \
+          "${{ inputs.docker-image }}"
