@@ -41,4 +41,6 @@ runs:
           --address "${{ inputs.tl-console-url }}" \
           -u "${{ inputs.tl-username }}" \
           -p "${{ inputs.tl-password }}" \
+          --compliance-threshold high \
+          --vulnerability-threshold high \
           "${{ inputs.docker-image }}"
